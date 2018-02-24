@@ -1,16 +1,44 @@
-FROM home/ubuntu
+FROM home/ubuntu as installit
+
+ARG VERSION
 
 RUN apt-get update
-RUN apt-get install -y mesa-utils    
+RUN apt-get install -y \
+    mesa-utils  \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/
+
+# fake the module tools, otherwise the installer bails
+COPY modprobe.fake /sbin/modprobe
+RUN  ln /sbin/modprobe /sbin/lsmod \
+     && ln /sbin/modprobe /sbin/rmmod \
+     && ln /sbin/modprobe /sbin/insmod \
+     && ln /sbin/modprobe /sbin/depmod \
+     && true
 
 # install nvidia driver
-#ADD NVIDIA-Linux-x86_64-384.98.run /tmp/NVIDIA-DRIVER.run
+COPY NVIDIA-Linux-x86_64-$VERSION.run /nv/NVIDIA-DRIVER.run
+ 
+RUN chmod a+x  /nv/NVIDIA-DRIVER.run && /nv/NVIDIA-DRIVER.run -a \
+     --no-kernel-module \
+     --no-x-check \
+     --no-nvidia-modprobe \
+     --no-install-compat32-libs \
+     --expert \
+     --no-install-libglvnd  \
+     --glvnd-glx-client \
+     --ui=none \
+     --install-libglvnd \
+     && rm -rf /nv 
+# -s --no-kernel-module --no-x-check --no-nvidia-modprobe --no-install-compat32-libs --expert --no-install-libglvnd  --glvnd-glx-client --install-libglvnd
 
-ADD libnvdir.tar.gz  /usr/lib
+RUN useradd -c "nv run user" -m -s /bin/bash -u 500 -G audio,video nv
 
-RUN    rm /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf \
-    && ln -s /usr/lib/nvidia-384/ld.so.conf /etc/ld.so.conf.d/x86_64-linux-gnu_GL.conf \
-    && ln -s /usr/lib/nvidia-384/ld.so.conf /etc/ld.so.conf.d/x86_64-linux-gnu_EGL.conf \
-    && ldconfig
+USER nv
+
+ENTRYPOINT [ ]
+CMD [ ]
+
+
+
 
 
