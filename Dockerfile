@@ -5,7 +5,7 @@ ARG VERSION
 RUN apt-get update
 RUN apt-get install -y \
     mesa-utils  \
-    && rm -rf /var/lib/apt/lists /var/cache/apt/
+    && true
 
 # fake the module tools, otherwise the installer bails
 COPY modprobe.fake /sbin/modprobe
@@ -28,17 +28,17 @@ RUN chmod a+x  /nv/NVIDIA-DRIVER.run && /nv/NVIDIA-DRIVER.run -a \
      --glvnd-glx-client \
      --ui=none \
      --install-libglvnd \
+     --opengl-headers \
+     && ldconfig \
      && rm -rf /nv 
 # -s --no-kernel-module --no-x-check --no-nvidia-modprobe --no-install-compat32-libs --expert --no-install-libglvnd  --glvnd-glx-client --install-libglvnd
 
-RUN useradd -c "nv run user" -m -s /bin/bash -u 500 -G audio,video nv
+# RUN useradd -c "nv run user" -m -s /bin/bash -u 500 -G audio,video nv
+# USER nv
 
-USER nv
 
 ENTRYPOINT [ ]
 CMD [ ]
-
-
 
 
 

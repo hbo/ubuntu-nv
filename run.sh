@@ -10,7 +10,7 @@ for d in  /dev/nvidia* /dev/dri/* ; do
 done
 
 docker run --rm --name nvtest \
-       --init   \
+       --init  -it \
        --hostname glxrunner \
        ${devices[*]} \
        -v /tmp/.X11-unix:/tmp/.X11-unix \
