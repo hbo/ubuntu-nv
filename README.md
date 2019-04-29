@@ -12,3 +12,8 @@ In order for this to work the official driver shell archive
 (e.g. NVIDIA-Linux-x86_64-390.25.run, available from here:
 http://www.nvidia.com/Download/index.aspx ) of Nvidia must be present
 in the directory of Dockerfile.
+
+
+Whatever version you want to install inside the image, when you run
+the image, its installed driver version should match the nvidia kernel
+driver version installed on the docker host.
